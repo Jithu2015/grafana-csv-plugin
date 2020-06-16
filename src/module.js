@@ -1,7 +1,7 @@
-import FileDatasource from './datasource';
-import FileDatasourceQueryCtrl from './query_ctrl';
+import CsvDatasource from './datasource';
+import DatasourceQueryCtrl from './query_ctrl';
 
-class FileConfigCtrl {
+class DatasourceConfigCtrl {
   constructor() {
     this.current.jsonData.encrypt = 'true';
 
@@ -94,7 +94,7 @@ class FileConfigCtrl {
     this.current.jsonData.columns.splice(rowIndex, 1);
   }
 }
-FileConfigCtrl.templateUrl = 'partials/config.html';
+DatasourceConfigCtrl.templateUrl = 'partials/config.html';
 
 class FileAnnotationsQueryCtrl {
   constructor() {
@@ -102,8 +102,8 @@ class FileAnnotationsQueryCtrl {
 }
 
 export {
-  FileDatasource as Datasource,
-  FileDatasourceQueryCtrl as QueryCtrl,
-  FileConfigCtrl as ConfigCtrl,
+  CsvDatasource as Datasource,
+  DatasourceQueryCtrl as QueryCtrl,
+  DatasourceConfigCtrl as ConfigCtrl,
   FileAnnotationsQueryCtrl as AnnotationsQueryCtrl,
 };

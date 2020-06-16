@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { QueryCtrl } from 'app/plugins/sdk';
 import { PanelEvents } from '@grafana/data';
 
-export default class FileDatasourceQueryCtrl extends QueryCtrl {
+export default class DatasourceQueryCtrl extends QueryCtrl {
   constructor($scope, $injector) {
     super($scope, $injector);
 
@@ -45,4 +45,4 @@ export default class FileDatasourceQueryCtrl extends QueryCtrl {
   }
 }
 
-FileDatasourceQueryCtrl.templateUrl = 'partials/query.editor.html';
+DatasourceQueryCtrl.templateUrl = 'partials/query.editor.html';

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import ResponseParse from './response_parser';
 
-export default class FileDatasource {
+export default class CsvDatasource {
   constructor(instanceSettings, backendSrv, timeSrv) {
     this.id = instanceSettings.id;
     this.name = instanceSettings.name;
