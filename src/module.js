@@ -7,8 +7,6 @@ class DatasourceConfigCtrl {
   }
 
   init() {
-    this.current.jsonData.encrypt = 'true';
-
     this.accessModes = [
       { text: 'Local', value: 'local' },
       { text: 'SFTP', value: 'sftp' },
@@ -22,6 +20,7 @@ class DatasourceConfigCtrl {
       { text: 'Date', value: 'date' },
     ];
 
+    this.current.jsonData.encrypt = 'true';
     this.current.jsonData.accessMode = this.current.jsonData.accessMode || 'local';
     this.current.jsonData.filename = this.current.jsonData.filename || '';
     this.current.jsonData.csvDelimiter = this.current.jsonData.csvDelimiter || '';
@@ -49,6 +48,23 @@ class DatasourceConfigCtrl {
       this.current.secureJsonData =  this.current.secureJsonData || {};
       this.current.secureJsonData['sftpPassword'] = event.currentTarget.value;
     };
+
+    // We must notify backend plugin to delete table in case of deleting DS
+    setTimeout(() => {
+      const deleteButton = document.querySelectorAll('button[aria-label~=Delete]');
+      if (deleteButton.length > 0) {
+        deleteButton[0].addEventListener('click', () => {
+          setTimeout(() => {
+            const confButton = document.querySelectorAll('button[aria-label~=Confirm]');
+            if (confButton.length > 0) {
+              confButton[0].addEventListener('click', () => {
+                console.log('Send delete table request!');
+              });
+            }
+          }, 100); // Timeout 100 - silly, but works
+        });
+      }
+    }, 0 );
   }
 
   onFilenameUpdate() {
