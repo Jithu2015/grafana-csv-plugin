@@ -19,6 +19,7 @@ type DB interface {
 	Init() error
 	Query(sql string) (*QueryResult, error)
 	LoadCSV(tableName string, descriptor *FileDescriptor) error
+	Delete(tableName string)
 }
 
 func ColumnTypeFromString(s string) ColumnType {

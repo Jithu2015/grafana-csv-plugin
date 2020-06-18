@@ -2,8 +2,34 @@ import CsvDatasource from './datasource';
 import DatasourceQueryCtrl from './query_ctrl';
 
 class DatasourceConfigCtrl {
-  constructor() {
+  constructor($scope, backendSrv) {
     this.init();
+
+    backendSrv.oldDeleteMethod = backendSrv.delete;
+    backendSrv.delete = (paramaters) => {
+
+      backendSrv.datasourceRequest({
+        url: '/api/tsdb/query',
+        method: 'POST',
+        data: {
+          queries: [{
+            datasourceId: this.current.id,
+            refId: '[delete-ds]',
+            query: this.current.name,
+          }]
+        }
+      }).then((res) => {
+        backendSrv.oldDeleteMethod(paramaters);
+      })
+        .catch((err) => {
+          backendSrv.oldDeleteMethod(paramaters);
+        });
+    };
+
+    $scope.$on('$destroy', () => {
+      backendSrv.delete = backendSrv.oldDeleteMethod;
+      delete backendSrv.oldDeleteMethod;
+    });
   }
 
   init() {
@@ -48,23 +74,6 @@ class DatasourceConfigCtrl {
       this.current.secureJsonData =  this.current.secureJsonData || {};
       this.current.secureJsonData['sftpPassword'] = event.currentTarget.value;
     };
-
-    // We must notify backend plugin to delete table in case of deleting DS
-    setTimeout(() => {
-      const deleteButton = document.querySelectorAll('button[aria-label~=Delete]');
-      if (deleteButton.length > 0) {
-        deleteButton[0].addEventListener('click', () => {
-          setTimeout(() => {
-            const confButton = document.querySelectorAll('button[aria-label~=Confirm]');
-            if (confButton.length > 0) {
-              confButton[0].addEventListener('click', () => {
-                console.log('Send delete table request!');
-              });
-            }
-          }, 100); // Timeout 100 - silly, but works
-        });
-      }
-    }, 0 );
   }
 
   onFilenameUpdate() {

@@ -34,15 +34,6 @@ func (ds *CSVFileDatasource) Query(ctx context.Context, req *datasource.Datasour
 		return nil, errors.New("no queries, nothing to execute")
 	}
 
-	dsModel, err := model.CreateDatasourceFrom(*req)
-	if err != nil {
-		errMsg := fmt.Sprintf("Could not create datasource: %s", err.Error())
-		ds.logError(errMsg)
-		ds.resultWithError(result, errMsg)
-		return result, nil
-	}
-	ds.debugf("Datasource=%s", dsModel.String())
-
 	queryModel, err := model.CreateQueryFrom(*req.Queries[0])
 	if err != nil {
 		errMsg := fmt.Sprintf("Could not create query: %s", err.Error())
@@ -51,6 +42,20 @@ func (ds *CSVFileDatasource) Query(ctx context.Context, req *datasource.Datasour
 		return result, nil
 	}
 	ds.debugf("Query=%s", queryModel.String())
+
+	if queryModel.RefID == "[delete-ds]" {
+		ds.Db.Delete(queryModel.Query)
+		return result, nil
+	}
+
+	dsModel, err := model.CreateDatasourceFrom(*req)
+	if err != nil {
+		errMsg := fmt.Sprintf("Could not create datasource: %s", err.Error())
+		ds.logError(errMsg)
+		ds.resultWithError(result, errMsg)
+		return result, nil
+	}
+	ds.debugf("Datasource=%s", dsModel.String())
 
 	// RefId is hardcoded in datasource.js
 	if queryModel.RefID == "[tests-connection]" {

@@ -15,7 +15,7 @@ const (
 )
 
 func main() {
-  	// GF logger
+	// GF logger
 	var logger = hclog.New(&hclog.LoggerOptions{
 		Name:  Name,
 		Level: hclog.Trace,
@@ -41,10 +41,10 @@ func main() {
 		},
 
 		Plugins: map[string]plugin.Plugin{
-		      Name: &datasource.DatasourcePluginImpl{Plugin: &CSVFileDatasource{
-		      		MainLogger: logger,
-		      		Db: csvDb,
-		      }},
+			Name: &datasource.DatasourcePluginImpl{Plugin: &CSVFileDatasource{
+				MainLogger: logger,
+				Db: csvDb,
+			}},
 		},
 
 		// A non-nil value here enables gRPC serving for this pluginLogger...

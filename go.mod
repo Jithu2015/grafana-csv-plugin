@@ -3,9 +3,9 @@ module github.com/paveldanilin/grafana-csv-plugin
 go 1.14
 
 require (
-	github.com/antonmedv/expr v1.8.6
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
-	github.com/grafana/grafana-plugin-model v0.0.0-20190930120109-1fc953a61fb4
+	github.com/grafana/grafana-plugin-model v0.0.0-20200514130833-df1eb6bdf4c5
+	github.com/grafana/grafana-plugin-sdk-go v0.67.0
 	github.com/hashicorp/go-hclog v0.12.2
 	github.com/hashicorp/go-plugin v1.2.2
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible

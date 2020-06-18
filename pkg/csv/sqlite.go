@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/araddon/dateparse"
-	"github.com/hashicorp/go-hclog"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/paveldanilin/grafana-csv-plugin/pkg/util"
 	"io"
@@ -13,14 +13,14 @@ import (
 	"time"
 )
 
-type DbSqlite struct {
+type dbSqlite struct {
 	db *sql.DB
-	logger hclog.Logger
+	logger log.Logger
 }
 
 // If maxIdleCons <= 0, no idle connections are retained
 // If connMaxLifetime <= 0, connections are reused forever.
-func NewDB(maxIdleCons int, connMaxLifetime time.Duration, logger hclog.Logger) (DB, error) {
+func NewDB(maxIdleCons int, connMaxLifetime time.Duration, logger log.Logger) (DB, error) {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	if err != nil {
 		return nil, err
@@ -29,16 +29,16 @@ func NewDB(maxIdleCons int, connMaxLifetime time.Duration, logger hclog.Logger) 
 	db.SetMaxIdleConns(maxIdleCons)
 	db.SetConnMaxLifetime(connMaxLifetime)
 
-	return &DbSqlite{db: db, logger: logger}, nil
+	return &dbSqlite{db: db, logger: logger}, nil
 }
 
-func (sqlite *DbSqlite) Init() error {
+func (sqlite *dbSqlite) Init() error {
 	// TODO: create tables for storing info about loaded CSV files
 	sqlite.logger.Debug("Init CSV DB")
 	return nil
 }
 
-func (sqlite *DbSqlite) Query(sql string) (*QueryResult, error) {
+func (sqlite *dbSqlite) Query(sql string) (*QueryResult, error) {
 	sqlite.logger.Debug("Query", "sql", sql)
 	rows, err := sqlite.db.Query(sql)
 	if err != nil {
@@ -48,7 +48,7 @@ func (sqlite *DbSqlite) Query(sql string) (*QueryResult, error) {
 	return newQueryResult(rows)
 }
 
-func (sqlite *DbSqlite) LoadCSV(tableName string, descriptor *FileDescriptor) error {
+func (sqlite *dbSqlite) LoadCSV(tableName string, descriptor *FileDescriptor) error {
 	sqlite.logger.Info("Loading CSV into table", "table", tableName, "filename", descriptor.Filename)
 
 	tableExists, err := sqlite.ifTableExists(tableName)
@@ -154,7 +154,11 @@ func (sqlite *DbSqlite) LoadCSV(tableName string, descriptor *FileDescriptor) er
 	return nil
 }
 
-func (sqlite *DbSqlite) exec(sql string) error {
+func (sqlite *dbSqlite) Delete(tableName string) {
+	_ = sqlite.exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName))
+}
+
+func (sqlite *dbSqlite) exec(sql string) error {
 	sqlite.logger.Debug("Execute", "sql", sql)
 	_, err := sqlite.db.Exec(sql)
 	if err != nil {
@@ -164,7 +168,7 @@ func (sqlite *DbSqlite) exec(sql string) error {
 	return nil
 }
 
-func (sqlite *DbSqlite) ifTableExists(tableName string) (bool, error) {
+func (sqlite *dbSqlite) ifTableExists(tableName string) (bool, error) {
 	rows, err := sqlite.db.Query(fmt.Sprintf("SELECT name FROM sqlite_master WHERE type='table' AND name='%s'", tableName))
 	if err != nil {
 		sqlite.logger.Error("Failed to check existence of table", "table", tableName, "error", err.Error())
